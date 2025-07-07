@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					hover: 'hsl(var(--primary-hover))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -52,6 +53,13 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				material: {
+					primary: 'hsl(var(--material-primary))',
+					'primary-dark': 'hsl(var(--material-primary-dark))',
+					secondary: 'hsl(var(--material-secondary))',
+					surface: 'hsl(var(--material-surface))',
+					outline: 'hsl(var(--material-outline))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -67,6 +75,18 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-surface': 'var(--gradient-surface)'
+			},
+			boxShadow: {
+				'material-sm': 'var(--shadow-sm)',
+				'material-md': 'var(--shadow-md)',
+				'material-lg': 'var(--shadow-lg)'
+			},
+			transitionTimingFunction: {
+				'material': 'cubic-bezier(0.4, 0, 0.2, 1)'
 			},
 			keyframes: {
 				'accordion-down': {
@@ -92,5 +112,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
