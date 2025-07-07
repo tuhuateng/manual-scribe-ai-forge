@@ -4,21 +4,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, Globe, Wand2, Bold, Italic, Code, Link, List, Hash, ChevronRight } from 'lucide-react';
+import { Download, FileText, Globe, Wand2, Bold, Italic, Code, Link, List, Hash } from 'lucide-react';
 import { marked } from 'marked';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarGroup, 
-  SidebarGroupContent, 
-  SidebarGroupLabel, 
-  SidebarMenu, 
-  SidebarMenuButton, 
-  SidebarMenuItem, 
-  SidebarProvider 
-} from '@/components/ui/sidebar';
 
 const ManualMaker = () => {
   const [content, setContent] = useState('# Welcome to Manual Maker\n\nStart creating your documentation here...\n\n## Features\n\n- AI-powered content generation\n- Real-time translation\n- Live preview\n- PDF export\n\n## Getting Started\n\n1. Write your content in the AI textbox\n2. Use the translator for multi-language support\n3. Preview your manual in real-time\n4. Export to PDF when ready');
@@ -168,34 +157,6 @@ This manual serves as your complete reference guide.`;
       return '<p>Error parsing markdown content</p>';
     }
   }, [content]);
-
-  // Extract table of contents from markdown content
-  const tableOfContents = useMemo(() => {
-    const lines = content.split('\n');
-    const headings = lines
-      .map((line, index) => {
-        const match = line.match(/^(#{1,6})\s+(.+)$/);
-        if (match) {
-          const level = match[1].length;
-          const text = match[2];
-          const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-          return { level, text, id, line: index + 1 };
-        }
-        return null;
-      })
-      .filter(Boolean);
-    return headings;
-  }, [content]);
-
-  const scrollToHeading = (id: string) => {
-    const element = document.getElementById('preview-content');
-    if (element) {
-      const heading = element.querySelector(`[id="${id}"], h1, h2, h3, h4, h5, h6`);
-      if (heading) {
-        heading.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-surface">
@@ -382,7 +343,7 @@ This manual serves as your complete reference guide.`;
             </CardContent>
           </Card>
 
-          {/* Preview Area with Sidebar */}
+          {/* Preview Area */}
           <Card className="lg:col-span-1 shadow-material-md border-material-outline">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -391,49 +352,13 @@ This manual serves as your complete reference guide.`;
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <SidebarProvider defaultOpen={true}>
-                <div className="flex h-[460px] w-full">
-                  <Sidebar className="w-48 border-r border-material-outline" variant="sidebar">
-                    <SidebarContent>
-                      <SidebarGroup>
-                        <SidebarGroupLabel>Table of Contents</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                          <SidebarMenu>
-                            {tableOfContents.map((heading, index) => (
-                              <SidebarMenuItem key={index}>
-                                <SidebarMenuButton 
-                                  onClick={() => scrollToHeading(heading.id)}
-                                  className={`text-xs ${heading.level > 1 ? `ml-${(heading.level - 1) * 2}` : ''}`}
-                                  size="sm"
-                                >
-                                  <ChevronRight className="w-3 h-3" />
-                                  <span className="truncate">{heading.text}</span>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                            ))}
-                            {tableOfContents.length === 0 && (
-                              <SidebarMenuItem>
-                                <SidebarMenuButton disabled size="sm">
-                                  <span className="text-muted-foreground">No headings found</span>
-                                </SidebarMenuButton>
-                              </SidebarMenuItem>
-                            )}
-                          </SidebarMenu>
-                        </SidebarGroupContent>
-                      </SidebarGroup>
-                    </SidebarContent>
-                  </Sidebar>
-                  <div className="flex-1">
-                    <div 
-                      id="preview-content"
-                      className="prose prose-sm max-w-none p-6 h-full overflow-y-auto bg-card"
-                      dangerouslySetInnerHTML={{ 
-                        __html: htmlContent 
-                      }}
-                    />
-                  </div>
-                </div>
-              </SidebarProvider>
+              <div 
+                id="preview-content"
+                className="prose prose-sm max-w-none p-6 h-[460px] overflow-y-auto bg-card"
+                dangerouslySetInnerHTML={{ 
+                  __html: htmlContent 
+                }}
+              />
             </CardContent>
           </Card>
         </div>
