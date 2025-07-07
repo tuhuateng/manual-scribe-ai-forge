@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, Globe, Wand2 } from 'lucide-react';
+import { Download, FileText, Globe, Wand2, Bold, Italic, Code, Link, List, Hash } from 'lucide-react';
 import { marked } from 'marked';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -22,6 +22,32 @@ const ManualMaker = () => {
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
+
+  const insertMarkdown = (before: string, after: string = '') => {
+    const textarea = document.getElementById('markdown-editor') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    const replacement = before + selectedText + after;
+    
+    const newContent = content.substring(0, start) + replacement + content.substring(end);
+    setContent(newContent);
+    
+    // Restore cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+    }, 0);
+  };
+
+  const formatBold = () => insertMarkdown('**', '**');
+  const formatItalic = () => insertMarkdown('*', '*');
+  const formatCode = () => insertMarkdown('`', '`');
+  const formatLink = () => insertMarkdown('[', '](url)');
+  const formatList = () => insertMarkdown('- ');
+  const formatHeading = () => insertMarkdown('# ');
 
   const generateContent = async () => {
     setIsGenerating(true);
@@ -168,12 +194,12 @@ This manual serves as your complete reference guide.`;
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
           
-          {/* AI Textbox Area */}
+          {/* Markdown Editor Area */}
           <Card className="lg:col-span-1 shadow-material-md border-material-outline">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Wand2 className="w-5 h-5 text-primary" />
-                AI Content Generator
+                Markdown Editor
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -187,11 +213,35 @@ This manual serves as your complete reference guide.`;
                   {isGenerating ? 'Generating...' : 'Generate Content'}
                 </Button>
               </div>
+              
+              {/* Markdown Toolbar */}
+              <div className="flex flex-wrap gap-1 p-2 bg-material-surface rounded-md border border-material-outline">
+                <Button variant="ghost" size="sm" onClick={formatBold} title="Bold">
+                  <Bold className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={formatItalic} title="Italic">
+                  <Italic className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={formatCode} title="Code">
+                  <Code className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={formatLink} title="Link">
+                  <Link className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={formatList} title="List">
+                  <List className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={formatHeading} title="Heading">
+                  <Hash className="w-4 h-4" />
+                </Button>
+              </div>
+
               <Textarea
+                id="markdown-editor"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Write your manual content here or use AI generation..."
-                className="min-h-[400px] resize-none border-material-outline focus:ring-primary"
+                placeholder="# Write your markdown content here\n\nUse the toolbar above for formatting or type markdown directly..."
+                className="min-h-[350px] resize-none border-material-outline focus:ring-primary font-mono text-sm"
               />
             </CardContent>
           </Card>
