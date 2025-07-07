@@ -11,7 +11,15 @@ import html2canvas from 'html2canvas';
 
 const ManualMaker = () => {
   const [content, setContent] = useState('# Welcome to Manual Maker\n\nStart creating your documentation here...\n\n## Features\n\n- AI-powered content generation\n- Real-time translation\n- Live preview\n- PDF export\n\n## Getting Started\n\n1. Write your content in the AI textbox\n2. Use the translator for multi-language support\n3. Preview your manual in real-time\n4. Export to PDF when ready');
-  const [translatedContent, setTranslatedContent] = useState('');
+  const [translations, setTranslations] = useState({
+    spanish: '',
+    french: '',
+    german: '',
+    italian: '',
+    portuguese: '',
+    chinese: '',
+    japanese: ''
+  });
   const [isGenerating, setIsGenerating] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
 
@@ -53,38 +61,31 @@ This manual serves as your complete reference guide.`;
 
   const translateContent = async () => {
     setIsTranslating(true);
-    // Simulate translation
+    // Simulate translation for all languages
     setTimeout(() => {
-      const translatedSample = `# Manual del ${new Date().toLocaleDateString()}
-
-## Descripción General
-Este manual proporciona una guía completa para su proyecto.
-
-## Secciones Clave
-
-### 1. Introducción
-Bienvenido a este manual completo creado con asistencia de IA.
-
-### 2. Comenzando
-Siga estos pasos para comenzar:
-- Revise los requisitos
-- Configure su entorno
-- Configure los ajustes necesarios
-
-### 3. Mejores Prácticas
-- Siempre siga las pautas establecidas
-- Pruebe sus implementaciones a fondo
-- Documente sus cambios
-
-### 4. Solución de Problemas
-Los problemas comunes y sus soluciones se enumerarán aquí.
-
-## Conclusión
-Este manual sirve como su guía de referencia completa.`;
-      
-      setTranslatedContent(translatedSample);
+      setTranslations({
+        spanish: '# Manual en Español\n\nContenido traducido al español...',
+        french: '# Manuel en Français\n\nContenu traduit en français...',
+        german: '# Handbuch auf Deutsch\n\nAuf Deutsch übersetzter Inhalt...',
+        italian: '# Manuale in Italiano\n\nContenuto tradotto in italiano...',
+        portuguese: '# Manual em Português\n\nConteúdo traduzido para português...',
+        chinese: '# 中文手册\n\n翻译成中文的内容...',
+        japanese: '# 日本語マニュアル\n\n日本語に翻訳された内容...'
+      });
       setIsTranslating(false);
     }, 1500);
+  };
+
+  const clearTranslations = () => {
+    setTranslations({
+      spanish: '',
+      french: '',
+      german: '',
+      italian: '',
+      portuguese: '',
+      chinese: '',
+      japanese: ''
+    });
   };
 
   const exportToPDF = async () => {
@@ -122,16 +123,14 @@ Este manual sirve como su guía de referencia completa.`;
     }
   };
 
-  const currentContent = translatedContent || content;
-  
   const htmlContent = useMemo(() => {
     try {
-      return marked(currentContent, { async: false }) as string;
+      return marked(content, { async: false }) as string;
     } catch (error) {
       console.error('Error parsing markdown:', error);
       return '<p>Error parsing markdown content</p>';
     }
-  }, [currentContent]);
+  }, [content]);
 
   return (
     <div className="min-h-screen bg-gradient-surface">
@@ -202,7 +201,7 @@ Este manual sirve como su guía de referencia completa.`;
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Globe className="w-5 h-5 text-primary" />
-                AI Translator
+                AI Translator (7 Languages)
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -214,22 +213,83 @@ Este manual sirve como su guía de referencia completa.`;
                   className="flex-1"
                   size="sm"
                 >
-                  {isTranslating ? 'Translating...' : 'Translate to Spanish'}
+                  {isTranslating ? 'Translating...' : 'Translate All'}
                 </Button>
                 <Button 
-                  onClick={() => setTranslatedContent('')}
+                  onClick={clearTranslations}
                   variant="ghost"
                   size="sm"
                 >
                   Clear
                 </Button>
               </div>
-              <Textarea
-                value={translatedContent}
-                onChange={(e) => setTranslatedContent(e.target.value)}
-                placeholder="Translated content will appear here..."
-                className="min-h-[400px] resize-none border-material-outline focus:ring-primary"
-              />
+              <Tabs defaultValue="spanish" className="w-full">
+                <TabsList className="grid w-full grid-cols-7 text-xs">
+                  <TabsTrigger value="spanish">ES</TabsTrigger>
+                  <TabsTrigger value="french">FR</TabsTrigger>
+                  <TabsTrigger value="german">DE</TabsTrigger>
+                  <TabsTrigger value="italian">IT</TabsTrigger>
+                  <TabsTrigger value="portuguese">PT</TabsTrigger>
+                  <TabsTrigger value="chinese">中文</TabsTrigger>
+                  <TabsTrigger value="japanese">日本語</TabsTrigger>
+                </TabsList>
+                <TabsContent value="spanish">
+                  <Textarea
+                    value={translations.spanish}
+                    onChange={(e) => setTranslations(prev => ({ ...prev, spanish: e.target.value }))}
+                    placeholder="Spanish translation..."
+                    className="min-h-[350px] resize-none border-material-outline focus:ring-primary"
+                  />
+                </TabsContent>
+                <TabsContent value="french">
+                  <Textarea
+                    value={translations.french}
+                    onChange={(e) => setTranslations(prev => ({ ...prev, french: e.target.value }))}
+                    placeholder="French translation..."
+                    className="min-h-[350px] resize-none border-material-outline focus:ring-primary"
+                  />
+                </TabsContent>
+                <TabsContent value="german">
+                  <Textarea
+                    value={translations.german}
+                    onChange={(e) => setTranslations(prev => ({ ...prev, german: e.target.value }))}
+                    placeholder="German translation..."
+                    className="min-h-[350px] resize-none border-material-outline focus:ring-primary"
+                  />
+                </TabsContent>
+                <TabsContent value="italian">
+                  <Textarea
+                    value={translations.italian}
+                    onChange={(e) => setTranslations(prev => ({ ...prev, italian: e.target.value }))}
+                    placeholder="Italian translation..."
+                    className="min-h-[350px] resize-none border-material-outline focus:ring-primary"
+                  />
+                </TabsContent>
+                <TabsContent value="portuguese">
+                  <Textarea
+                    value={translations.portuguese}
+                    onChange={(e) => setTranslations(prev => ({ ...prev, portuguese: e.target.value }))}
+                    placeholder="Portuguese translation..."
+                    className="min-h-[350px] resize-none border-material-outline focus:ring-primary"
+                  />
+                </TabsContent>
+                <TabsContent value="chinese">
+                  <Textarea
+                    value={translations.chinese}
+                    onChange={(e) => setTranslations(prev => ({ ...prev, chinese: e.target.value }))}
+                    placeholder="Chinese translation..."
+                    className="min-h-[350px] resize-none border-material-outline focus:ring-primary"
+                  />
+                </TabsContent>
+                <TabsContent value="japanese">
+                  <Textarea
+                    value={translations.japanese}
+                    onChange={(e) => setTranslations(prev => ({ ...prev, japanese: e.target.value }))}
+                    placeholder="Japanese translation..."
+                    className="min-h-[350px] resize-none border-material-outline focus:ring-primary"
+                  />
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 
@@ -256,9 +316,9 @@ Este manual sirve como su guía de referencia completa.`;
         {/* Bottom Info Bar */}
         <div className="mt-6 flex items-center justify-between text-sm text-muted-foreground bg-card rounded-lg p-4 shadow-material-sm border border-material-outline">
           <div className="flex items-center gap-4">
-            <span>Characters: {currentContent.length}</span>
-            <span>Words: {currentContent.split(/\s+/).filter(word => word.length > 0).length}</span>
-            <span>Lines: {currentContent.split('\n').length}</span>
+            <span>Characters: {content.length}</span>
+            <span>Words: {content.split(/\s+/).filter(word => word.length > 0).length}</span>
+            <span>Lines: {content.split('\n').length}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
