@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, Globe, Wand2, Bold, Italic, Code, Link, List, Hash } from 'lucide-react';
+import { Download, FileText, Globe, Wand2, Bold, Italic, Code, Link, List, Hash, Pen, Eraser, Palette } from 'lucide-react';
 import { marked } from 'marked';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -22,6 +22,13 @@ const ManualMaker = () => {
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
+  
+  // Drawing area state
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [drawingMode, setDrawingMode] = useState<'pen' | 'eraser'>('pen');
+  const [strokeColor, setStrokeColor] = useState('#000000');
+  const [strokeWidth, setStrokeWidth] = useState(2);
 
   const insertMarkdown = (before: string, after: string = '') => {
     const textarea = document.getElementById('markdown-editor') as HTMLTextAreaElement;
@@ -149,6 +156,74 @@ This manual serves as your complete reference guide.`;
     }
   };
 
+  // Drawing functions
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    setIsDrawing(true);
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.lineWidth = strokeWidth;
+      ctx.lineCap = 'round';
+      
+      if (drawingMode === 'pen') {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = strokeColor;
+      } else {
+        ctx.globalCompositeOperation = 'destination-out';
+      }
+      
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+
+  const saveDrawing = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const link = document.createElement('a');
+    link.download = 'manual-drawing.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  };
+
   const htmlContent = useMemo(() => {
     try {
       return marked(content, { async: false }) as string;
@@ -192,7 +267,7 @@ This manual serves as your complete reference guide.`;
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-12rem)]">
           
           {/* Markdown Editor Area */}
           <Card className="lg:col-span-1 shadow-material-md border-material-outline">
@@ -408,6 +483,93 @@ This manual serves as your complete reference guide.`;
                     }}
                   />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Line Drawing Area */}
+          <Card className="lg:col-span-1 shadow-material-md border-material-outline">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Pen className="w-5 h-5 text-primary" />
+                Line Drawing Area
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Drawing Tools */}
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant={drawingMode === 'pen' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setDrawingMode('pen')}
+                >
+                  <Pen className="w-4 h-4 mr-1" />
+                  Pen
+                </Button>
+                <Button
+                  variant={drawingMode === 'eraser' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setDrawingMode('eraser')}
+                >
+                  <Eraser className="w-4 h-4 mr-1" />
+                  Eraser
+                </Button>
+                <input
+                  type="color"
+                  value={strokeColor}
+                  onChange={(e) => setStrokeColor(e.target.value)}
+                  className="w-8 h-8 rounded border border-material-outline cursor-pointer"
+                  title="Choose color"
+                />
+              </div>
+
+              {/* Stroke Width */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Width:</span>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={strokeWidth}
+                  onChange={(e) => setStrokeWidth(Number(e.target.value))}
+                  className="flex-1"
+                />
+                <span className="text-sm w-6">{strokeWidth}px</span>
+              </div>
+
+              {/* Canvas */}
+              <div className="border border-material-outline rounded-md overflow-hidden bg-white">
+                <canvas
+                  ref={canvasRef}
+                  width={300}
+                  height={300}
+                  className="cursor-crosshair block w-full"
+                  onMouseDown={startDrawing}
+                  onMouseMove={draw}
+                  onMouseUp={stopDrawing}
+                  onMouseLeave={stopDrawing}
+                />
+              </div>
+
+              {/* Canvas Controls */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearCanvas}
+                  className="flex-1"
+                >
+                  Clear
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={saveDrawing}
+                  className="flex-1"
+                >
+                  <Download className="w-4 h-4 mr-1" />
+                  Save
+                </Button>
               </div>
             </CardContent>
           </Card>
