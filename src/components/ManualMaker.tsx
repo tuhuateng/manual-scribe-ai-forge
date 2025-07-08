@@ -352,13 +352,63 @@ This manual serves as your complete reference guide.`;
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div 
-                id="preview-content"
-                className="prose prose-sm max-w-none p-6 h-[460px] overflow-y-auto bg-card"
-                dangerouslySetInnerHTML={{ 
-                  __html: htmlContent 
-                }}
-              />
+              <div className="flex h-[460px]">
+                {/* Left Sidebar Menu */}
+                <div className="w-48 bg-material-surface border-r border-material-outline p-4 overflow-y-auto">
+                  <h3 className="text-sm font-semibold mb-3 text-foreground">Table of Contents</h3>
+                  <div className="space-y-1">
+                    {content.split('\n').map((line, index) => {
+                      const match = line.match(/^(#{1,6})\s+(.+)$/);
+                      if (match) {
+                        const level = match[1].length;
+                        const title = match[2];
+                        const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                        return (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              const element = document.getElementById(`heading-${id}`);
+                              if (element) {
+                                element.scrollIntoView({ behavior: 'smooth' });
+                              }
+                            }}
+                            className={`block w-full text-left text-xs hover:bg-material-accent hover:text-accent-foreground rounded px-2 py-1 transition-colors ${
+                              level === 1 ? 'font-semibold' : 
+                              level === 2 ? 'font-medium pl-3' : 
+                              level === 3 ? 'pl-5' : 
+                              level === 4 ? 'pl-7' : 
+                              level === 5 ? 'pl-9' : 'pl-11'
+                            }`}
+                          >
+                            {title}
+                          </button>
+                        );
+                      }
+                      return null;
+                    }).filter(Boolean)}
+                  </div>
+                </div>
+                
+                {/* Preview Content */}
+                <div className="flex-1 overflow-y-auto">
+                  <div 
+                    id="preview-content"
+                    className="prose prose-sm max-w-none p-6 bg-card"
+                    dangerouslySetInnerHTML={{ 
+                      __html: htmlContent.replace(
+                        /<h([1-6])>/g, 
+                        (match, level) => {
+                          const nextContent = htmlContent.slice(htmlContent.indexOf(match) + match.length);
+                          const endTag = nextContent.indexOf(`</h${level}>`);
+                          const title = nextContent.slice(0, endTag);
+                          const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                          return `<h${level} id="heading-${id}">`;
+                        }
+                      )
+                    }}
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
