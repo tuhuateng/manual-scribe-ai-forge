@@ -270,7 +270,7 @@ This manual serves as your complete reference guide.`;
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-12rem)]">
           
           {/* Markdown Editor Area */}
-          <Card className="lg:col-span-1 shadow-material-md border-material-outline">
+          <Card className="md:col-span-1 shadow-material-md border-material-outline">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Wand2 className="w-5 h-5 text-primary" />
@@ -322,7 +322,7 @@ This manual serves as your complete reference guide.`;
           </Card>
 
           {/* AI Translator Area */}
-          <Card className="lg:col-span-1 shadow-material-md border-material-outline">
+          <Card className="md:col-span-1 shadow-material-md border-material-outline">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Globe className="w-5 h-5 text-primary" />
@@ -419,7 +419,7 @@ This manual serves as your complete reference guide.`;
           </Card>
 
           {/* Preview Area */}
-          <Card className="lg:col-span-1 shadow-material-md border-material-outline">
+          <Card className="md:col-span-1 shadow-material-md border-material-outline">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <FileText className="w-5 h-5 text-primary" />
@@ -488,7 +488,7 @@ This manual serves as your complete reference guide.`;
           </Card>
 
           {/* Line Drawing Area */}
-          <Card className="lg:col-span-1 shadow-material-md border-material-outline">
+          <Card className="md:col-span-1 shadow-material-md border-material-outline">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Pen className="w-5 h-5 text-primary" />
