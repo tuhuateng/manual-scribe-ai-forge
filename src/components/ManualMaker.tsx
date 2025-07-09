@@ -267,7 +267,7 @@ This manual serves as your complete reference guide.`;
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-12rem)]">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-12rem)]">
           
           {/* Markdown Editor Area */}
           <Card className="lg:col-span-1 shadow-material-md border-material-outline">
